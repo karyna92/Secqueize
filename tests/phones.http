@@ -1,0 +1,19 @@
+////
+POST http://localhost:5000/api/phones HTTP/1.1
+Content-Type: application/json
+
+{
+  "model": "iPhone 14",
+  "brand": "Apple",
+  "year": "2023-09-22",
+  "ram": 6,
+  "cpu": "A16 Bionic",
+  "displaySize": 6,
+  "hasNFC": true
+}
+
+
+
+######
+
+GET http://localhost:5000/api/phones HTTP/1.1
