@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const phonesController= require('../controllers/phonesController');
+const pagination= require('../middleware/pagination')
 const dataValidation  = require('../middleware/dataValidation');
 const {
   PHONE_VALIDATION_SCHEMA,
@@ -9,25 +10,22 @@ const {
 
 const phonesRouter = Router();
 
-phonesRouter.get('/', phonesController.getAllPhones);
+phonesRouter.get('/', dataValidation( PHONE_VALIDATION_SCHEMA), phonesController.getAllPhones);
 
 
 phonesRouter.post('/', phonesController.addPhone);
 
-// phonesRouter
-//   .route('/filters')
-//   .get(phonesController.getFilteredPhones)
-//   .put(phonesController.updateMultiplePhones)
-//   .delete(phonesController.deleteMultiplePhones);
+phonesRouter
+  .route('/filters')
+  .get(pagination , phonesController.getFilteredPhones)
+  .put(phonesController.updateMultiplePhones)
+  .delete(phonesController.deleteMultiplePhones);
 
-// phonesRouter
-//   .route('/:phoneId')
-//   .put(
-//     dataValidation(UPDATE_PHONE_VALIDATION_SCHEMA),
-//     phonesController.updatePhone
-//   )
-//   .delete(phonesController.deletePhone);
+phonesRouter
+  .route('/:phoneId')
+  .put(dataValidation(UPDATE_PHONE_VALIDATION_SCHEMA), phonesController.updatePhone)
+  .delete(phonesController.deletePhone);
 
-// phonesRouter.route('/above/:year').get(phonesController.getPhonesAboveYear);
+phonesRouter.route('/above/:year').get(phonesController.getPhonesAboveYear);
 
 module.exports = phonesRouter;

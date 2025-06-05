@@ -17,3 +17,26 @@ Content-Type: application/json
 ######
 
 GET http://localhost:5000/api/phones HTTP/1.1
+
+
+#####
+GET http://localhost:5000/api/phones/filters?page=1&limit=5 HTTP/1.1
+
+####
+GET http://localhost:5000/api/phones/filters?limit=3&brand=Samsung&model=samsung&year=2021 HTTP/1.1
+
+###
+GET http://localhost:5000/api/phones/filters?year=2021 HTTP/1.1
+
+
+###
+PUT http://localhost:5000/api/phones/1 HTTP/1.
+Content-Type: application/json
+
+{
+  "ram": 8
+}
+
+###
+DELETE  http://localhost:5000/api/phones/7 HTTP/1.
+

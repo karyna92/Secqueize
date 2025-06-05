@@ -2,27 +2,21 @@ const MAX_LIMIT = 5;
 
 module.exports = async (req, res, next) => {
   try {
-    // 1. Зчитування ліміту та оффсету з параметрів запиту
-    const {
-      query: { limit, offset },
-    } = req;
+    let page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || MAX_LIMIT;
 
-    // 2. Перевірка ліміту та оффсету, створення об єкту pagination
-    if (!limit && !offset) {
-      // якщо користувач не надіслав ні ліміта ні оффсета
-      req.pagination = {
-        // відправляʼмо першу сторінку
-        limit: 5,
-        offset: 0,
-      };
-    } else {
-      req.pagination = {
-        limit: limit > MAX_LIMIT || limit <= 0 ? MAX_LIMIT : limit,
-        offset: offset < 0 ? 0 : offset,
-      };
+    if (limit <= 0 || limit > MAX_LIMIT) {
+      limit = MAX_LIMIT;
     }
 
-    // 3. Передаємо керування наступному мідлвейру в ланцюжку мідлвейрів
+    const offset = (page - 1) * limit;
+
+    req.pagination = {
+      limit,
+      offset,
+      page,
+    };
+
     next();
   } catch (error) {
     next(error);

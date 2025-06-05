@@ -27,76 +27,90 @@ module.exports.addPhone = async (req,res, next)=>{
 module.exports.updatePhone = async( req, res, next)=>{
     try {
         const { body, params:{phoneId} } = req;; 
-       const [,{updatedPhone}] = await Phone.update(body,{where: { id: userId }});
-       return res.status(200).send(updatedPhone)
+       const [updateCount] = await Phone.update(body, {where: { id: phoneId }});
+
+       if (updateCount === 0) {
+         return res
+           .status(404)
+           .json({ message: 'Phone not found or nothing changed' });
+       }
+       res.status(200).send({ message: 'Phone updated' });
     }
     catch(error){
         next(error)
     }
 }
-module.exports.deletePhone = async (req, res, next)=>{           
+module.exports.deletePhone = async (req, res, next)=>{    
+  throw new Error(`Phone with id ${phoneId} not found`);       
     try {     
         const { params:{phoneId} } = req;
-            const deletedCount = await User.destroy({
+            const deletedCount = await Phone.destroy({
               where: { id: phoneId },
             });
-            return res.status(200).send({ message: `User deleted successfully`})
+       if (deletedCount === 0) {
+         return res
+           .status(404)
+           .json({ message: 'Phone not found' });
+       }
+       res.status(200).send({ message: `Phone deleted successfully` });
      }
     catch(error){ 
         next(error)
     }
 }
-module.exports.getFilteredPhones = async (req, res, next)=>{ 
+module.exports.getFilteredPhones = async (req, res, next) => {
     try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
-        const offset = (page - 1) * limit;
-    
+      const { year, brand, model } = req.query;
+      const { limit, offset, page } = req.pagination;
+  
+      const where = {};
 
-        const { year, brand, model } = req.query;
-    
-        const where = {};
-    
-        if (year) {
-          where.year = year;
-        }
-    
-        if (brand) {
-          where.brand = {
-            [Op.iLike]: `%${brand}%`,
-          };
-        }
-    
-        if (model) {
-          where.model = {
-            [Op.iLike]: `%${model}%`,
-          };
-        }
-        const { count, rows } = await Phone.findAndCountAll({
-          where,
-          limit,
-          offset,
-          order: [['createdAt', 'DESC']], 
-        });
-    
-        res.status(200).json({
-          currentPage: page,
-          totalPages: Math.ceil(count / limit),
-          totalItems: count,
-          phones: rows,
-        });
-    }catch (error) {
-        next(error);
+
+  
+      if (year) {
+        const startDate = `${year}-01-01`;
+        const endDate = `${year}-12-31`;
+where.year = { [Op.between]: [startDate, endDate] };
+      }
+  
+      if (brand) {
+        where.brand = {
+          [Op.iLike]: `%${brand}%`,
+        };
+      }
+  
+      if (model) {
+        where.model = {
+          [Op.iLike]: `%${model}%`,
+        };
+      }
+  
+      const { count, rows } = await Phone.findAndCountAll({
+        where,
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+      });
+  
+      res.status(200).json({
+        currentPage: page,
+        totalPages: Math.ceil(count / limit),
+        totalItems: count,
+        phones: rows,
+      });
+    } catch (error) {
+      next(error);
     }
-}
+  };
 module.exports.getPhonesAboveYear = async (req, res, next) => {
   try {
     const { params: { year }} = req;
+    const startDate = `${year}-01-01`;
+    const endDate = `${year}-12-31`;
+
     const phones = await Phone.findAll({
       where: {
-        year: {
-          [Op.gt]: year, 
-        },
+        year: { [Op.between]: [startDate, endDate] }
       },
       order: [['year', 'ASC']],
     });
