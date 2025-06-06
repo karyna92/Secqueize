@@ -7,11 +7,10 @@ module.exports.PHONE_VALIDATION_SCHEMA = yup.object({
     .trim()
     .min(1, 'Model cannot be empty'),
 
-  brand: yup
-    .string()
-    // .required('Brand is required')
-    .trim()
-    .min(1, 'Brand cannot be empty'),
+  brandId: yup
+    .number()
+    // .required('RAM is required')
+    .integer('id must be an integer'),
 
   year: yup
     .date()
@@ -35,14 +34,13 @@ module.exports.PHONE_VALIDATION_SCHEMA = yup.object({
     // .required('Display size is required')
     .moreThan(0, 'Display size must be greater than 0'),
 
-  hasNFC: yup.boolean()
-  
+  hasNFC: yup.boolean(),
 });
   
 
 module.exports.UPDATE_PHONE_VALIDATION_SCHEMA = yup.object({
   model: yup.string().trim().min(1),
-  brand: yup.string().trim().min(1),
+  brand: yup.number().integer().positive(),
   year: yup
     .date()
     .max(new Date(), 'Year must be in the past'),

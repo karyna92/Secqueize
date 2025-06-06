@@ -1,4 +1,4 @@
-const{ Phone}=require('../models')
+const{ Phone, Brand}=require('../models')
 const { Op } = require('sequelize');
 
 module.exports.getAllPhones = async (req, res) =>{ 
@@ -60,7 +60,7 @@ module.exports.deletePhone = async (req, res, next)=>{
 }
 module.exports.getFilteredPhones = async (req, res, next) => {
     try {
-      const { year, brand, model } = req.query;
+      const { year, model } = req.query;
       const { limit, offset, page } = req.pagination;
   
       const where = {};
@@ -71,12 +71,6 @@ module.exports.getFilteredPhones = async (req, res, next) => {
         const startDate = `${year}-01-01`;
         const endDate = `${year}-12-31`;
 where.year = { [Op.between]: [startDate, endDate] };
-      }
-  
-      if (brand) {
-        where.brand = {
-          [Op.iLike]: `%${brand}%`,
-        };
       }
   
       if (model) {
@@ -199,4 +193,44 @@ module.exports.deleteMultiplePhones= async (req, res, next) =>{
      }catch(error){ 
         next(error);
      }
+}
+
+module.exports.getPhonesByBrand = async (req, res, next) => {
+  try {
+    const { brandName } = req.params;
+
+    const brand = await Brand.findOne({ where: { name: brandName } });
+
+    if (!brand) {
+      return res.status(404).json({ message: 'Brand not found' });
+    }
+    const phones = await Phone.findAll({
+      where: { brandId: brand.id },
+      include: [{ model: Brand}],
+    });
+
+    res.json(phones);
+  } catch (error) {
+  next(error)
+  }
+};
+
+module.exports.addPhonesByBrand = async (req, res, next) =>{ 
+  try{
+    const phoneData = req.body;
+    const { brandName } = req.params;
+    const brand = await Brand.findOne({ where: { name: brandName } });
+
+    if (!brand) {
+      return res.status(404).json({ message: 'Brand not found' });
+    }
+
+    const newPhone = await Phone.create({
+      ...phoneData,
+      brandId: brand.id,
+    });
+    res.status(201).json(newPhone);
+  } catch(error){
+     next(error);
+  }
 }

@@ -10,7 +10,9 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Phone.belongsTo(models.Brand, {
+        foreignKey: 'brandId',
+      });
     }
   }
   Phone.init(
@@ -22,13 +24,14 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: true,
         },
       },
-      brand: {
-        type: DataTypes.STRING,
+      brandId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
-        validate: {
-          notEmpty: true,
+        references: {
+          model: 'brands',
+          key: 'id',
         },
-      },
+      },   
       year: {
         type: DataTypes.DATEONLY,
         allowNull: false,
