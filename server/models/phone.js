@@ -69,6 +69,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         field: 'has_nfc',
       },
+      image:{ 
+        type: DataTypes.STRING,
+        allowNull: true,
+      }
     },
     {
       sequelize,

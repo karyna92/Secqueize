@@ -2,10 +2,12 @@ const { Router } = require('express');
 const phonesController= require('../controllers/phonesController');
 const pagination= require('../middleware/pagination')
 const dataValidation  = require('../middleware/dataValidation');
+const upload = require('../middleware/upload');
 const {
   PHONE_VALIDATION_SCHEMA,
   UPDATE_PHONE_VALIDATION_SCHEMA,
 } = require('../utils/schemas/validationSchema');
+
 
 
 const phonesRouter = Router();
@@ -34,4 +36,8 @@ phonesRouter
   .get(phonesController.getPhonesByBrand)
   .post(phonesController.addPhonesByBrand);
 
-module.exports = phonesRouter;
+  phonesRouter
+    .route('/images/:phoneId')
+    .put(upload.PhonesImage, phonesController.updatePhoneImage);       
+
+module.exports = phonesRouter;   

@@ -1,5 +1,8 @@
 const{ Phone, Brand}=require('../models')
 const { Op } = require('sequelize');
+const path = require('path');
+const createHttpError = require('http-errors');
+const { STATIC_IMAGES_FOLDER } = require('../config/path.configs');
 
 module.exports.getAllPhones = async (req, res) =>{ 
   try { 
@@ -234,3 +237,33 @@ module.exports.addPhonesByBrand = async (req, res, next) =>{
      next(error);
   }
 }
+
+module.exports.updatePhoneImage = async (req, res, next) =>
+{
+  // uploadController.js
+   
+      const {
+        file,
+        params: { phoneId },
+      } = req;
+    
+      try {
+        if (!file) {
+          return next((422, 'Image is Required'));
+        }
+    
+        const [, [updatedPhone]] = await Phone.update(
+          { image: path.join(STATIC_IMAGES_FOLDER, file.filename) }, // "images/filename"
+          { where: { id: phoneId }, returning: true, raw: true }
+        );
+    
+        if (!updatedPhone) {
+          return next(createHttpError(404, 'Phone Not Found'));
+        }
+    
+        res.status(200).send({ data: updatedPhone});
+      } catch (error) {
+        next(error);
+      }
+  };
+
