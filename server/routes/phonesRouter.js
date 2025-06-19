@@ -32,6 +32,11 @@ phonesRouter.route('/above/:year').get(phonesController.getPhonesAboveYear);
 
 
 phonesRouter
+  .route('/brands')
+  .get(phonesController.getBrands);
+
+
+phonesRouter
   .route('/brands/:brandName')
   .get(phonesController.getPhonesByBrand)
   .post(phonesController.addPhonesByBrand);

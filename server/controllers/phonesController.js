@@ -43,8 +43,7 @@ module.exports.updatePhone = async( req, res, next)=>{
         next(error)
     }
 }
-module.exports.deletePhone = async (req, res, next)=>{    
-  throw new Error(`Phone with id ${phoneId} not found`);       
+module.exports.deletePhone = async (req, res, next)=>{        
     try {     
         const { params:{phoneId} } = req;
             const deletedCount = await Phone.destroy({
@@ -267,3 +266,12 @@ module.exports.updatePhoneImage = async (req, res, next) =>
       }
   };
 
+
+  module.exports.getBrands = async (req, res, next) =>{ 
+    try { 
+const brands = await Brand.findAll({attributes: ['id', 'name']});
+res.status(200).json(brands);
+    }catch(error){ 
+      next(error);
+    }
+  }
